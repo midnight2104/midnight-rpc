@@ -1,0 +1,42 @@
+
+### mock
+POST http://localhost:8080/invoke
+Content-Type: application/json
+
+{
+  "service": "com.midnight.rpc.demo.api.OrderService",
+  "method": "hashCode",
+  "args":[]
+}
+
+<> 2024-03-07T205630.200.json
+<> 2024-03-07T205620.400.json
+
+### 获取订单信息
+POST http://localhost:8080/invoke
+Content-Type: application/json
+
+{
+  "service": "com.midnight.rpc.demo.api.OrderService",
+  "method": "findById",
+  "args": [201]
+}
+
+<> 2024-03-07T205538.200.json
+<> 2024-03-07T205502.400.json
+
+
+### 获取用户信息
+POST http://localhost:8080/invoke
+Content-Type: application/json
+
+{
+  "service": "com.midnight.rpc.demo.api.UserService",
+  "method": "findById",
+  "args": [101]
+}
+
+
+<> 2024-03-07T205432.200.json
+<> 2024-03-07T205342.200.json
+<> 2024-03-07T204557.404.json
