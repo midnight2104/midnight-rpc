@@ -24,11 +24,9 @@ public class RpcDemoProviderApplication {
     @Autowired
     private ProviderBootstrap providerBootstrap;
 
-
     @RequestMapping("/invoke")
     public RpcResponse invoke(@RequestBody RpcRequest request) {
         return providerBootstrap.invoke(request);
     }
-
 
 }
