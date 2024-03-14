@@ -18,4 +18,10 @@ public class RpcResponse<T> {
      * 响应结果
      */
     private T data;
+
+    /**
+     * 异常对象
+     */
+    private Exception ex;
+
 }
