@@ -44,25 +44,8 @@ public class RpcDemoConsumerApplication {
             User user = userService.findById(19);
             System.out.println("类对象的远程调用 result userService.findById(19) = " + user);
 
-            // 本地方法的远程调用
-            System.out.println("本地方法的远程调用 "+userService.toString());
-
-            // 基本类型的远程调用
-            System.out.println("基本类型的远程调用 "+userService.getId(11));
-
-            // String类型的远程调用
-            System.out.println("String类型的远程调用 "+userService.getName());
-
-            // 订单服务
-            Order order = orderService.findById(9);
-            System.out.println("订单服务 RPC result orderService.findById(9) = " + order);
-
-            // 嵌套注入
-            demo2.test();
-
-            // 异常测试
-            System.out.println("异常测试 RPC result orderService.findById(404) ");
-            Order order404 = orderService.findById(404);
+            User user2 = userService.findById(19, "hello");
+            System.out.println("重载方法 findById  = " + user2);
 
         };
     }

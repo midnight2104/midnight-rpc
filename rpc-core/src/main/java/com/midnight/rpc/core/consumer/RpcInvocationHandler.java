@@ -33,7 +33,7 @@ public class RpcInvocationHandler implements InvocationHandler {
         // 封装请求参数
         RpcRequest request = new RpcRequest();
         request.setService(service.getCanonicalName());
-        request.setMethod(method.getName());
+        request.setMethodSign(MethodUtils.methodSign(method));
         request.setArgs(args);
 
         // 发起远程调用

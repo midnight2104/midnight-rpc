@@ -14,6 +14,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User findById(int id, String name) {
+        return new User(id, "重载方法 Midnight-" + System.currentTimeMillis() + "-" + name);
+    }
+
+    @Override
     public int getId(int id) {
         return id;
     }
