@@ -5,6 +5,7 @@ import com.midnight.rpc.core.api.RpcRequest;
 import com.midnight.rpc.core.api.RpcResponse;
 import com.midnight.rpc.core.meta.ProviderMeta;
 import com.midnight.rpc.core.util.MethodUtils;
+import com.midnight.rpc.core.util.TypeUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import org.springframework.context.ApplicationContext;
@@ -67,7 +68,12 @@ public class ProviderBootstrap implements ApplicationContextAware {
         ProviderMeta meta = findProviderMeta(metas, request.getMethodSign());
         try {
             Method method = meta.getMethod();
-            Object res = method.invoke(meta.getServiceImpl(), request.getArgs());
+
+            // 参数类型转换
+            Object[] args = processArgs(request.getArgs(), method.getParameterTypes());
+
+            // 反射
+            Object res = method.invoke(meta.getServiceImpl(), args);
             rpcResponse.setStatus(true);
             rpcResponse.setData(res);
             return rpcResponse;
@@ -78,6 +84,15 @@ public class ProviderBootstrap implements ApplicationContextAware {
             rpcResponse.setEx(new RuntimeException(e.getMessage()));
         }
         return rpcResponse;
+    }
+
+    private Object[] processArgs(Object[] args, Class<?>[] parameterTypes) {
+        if (args == null || args.length == 0) return args;
+        Object[] actuals = new Object[args.length];
+        for (int i = 0; i < args.length; i++) {
+            actuals[i] = TypeUtils.cast(args[i], parameterTypes[i]);
+        }
+        return actuals;
     }
 
     private ProviderMeta findProviderMeta(List<ProviderMeta> metas, String methodSign) {

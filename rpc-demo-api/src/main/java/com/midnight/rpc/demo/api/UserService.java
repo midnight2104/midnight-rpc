@@ -8,5 +8,18 @@ public interface UserService {
 
     int getId(int id);
 
+    long getId(long id);
+
     String getName();
+
+    long getId(User user);
+
+    long getId(float id);
+
+
+    String getName(int id);
+
+    int[] getIds();
+    long[] getLongIds();
+    int[] getIds(int[] ids);
 }

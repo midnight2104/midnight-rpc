@@ -2,7 +2,6 @@ package com.rpc.consumer.rpcdemoconsumer;
 
 import com.midnight.rpc.core.annotation.RpcConsumer;
 import com.midnight.rpc.core.consumer.ConsumerConfig;
-import com.midnight.rpc.demo.api.Order;
 import com.midnight.rpc.demo.api.OrderService;
 import com.midnight.rpc.demo.api.User;
 import com.midnight.rpc.demo.api.UserService;
@@ -40,12 +39,37 @@ public class RpcDemoConsumerApplication {
     @Bean
     public ApplicationRunner consumerRunner() {
         return x -> {
-            // 类对象的远程调用
-            User user = userService.findById(19);
-            System.out.println("类对象的远程调用 result userService.findById(19) = " + user);
 
-            User user2 = userService.findById(19, "hello");
-            System.out.println("重载方法 findById  = " + user2);
+         //   System.out.println(" userService.getId(10f) = " + userService.getId(10f));
+
+            System.out.println(" userService.getId(new User(100,\"Midnight\")) = " +
+                    userService.getId(new User(100, "Midnight")));
+
+            User user = userService.findById(1);
+            System.out.println("RPC result userService.findById(1) = " + user);
+
+            User user1 = userService.findById(1, "Midnight");
+            System.out.println("RPC result userService.findById(1, \"Midnight\") = " + user1);
+
+            System.out.println(userService.getName());
+
+            System.out.println(userService.getName(123));
+
+            System.out.println(userService.toString());
+
+            System.out.println(userService.getId(11));
+
+            System.out.println(userService.getName());
+
+            System.out.println(" ===> userService.getLongIds()");
+            for (long id : userService.getLongIds()) {
+                System.out.println(id);
+            }
+
+            System.out.println(" ===> userService.getLongIds()");
+            for (long id : userService.getIds(new int[]{4, 5, 6})) {
+                System.out.println(id);
+            }
 
         };
     }

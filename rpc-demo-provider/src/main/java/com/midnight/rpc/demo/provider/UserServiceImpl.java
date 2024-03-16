@@ -24,7 +24,42 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public long getId(long id) {
+        return id;
+    }
+
+    @Override
     public String getName() {
         return "Midnight123456";
+    }
+
+    @Override
+    public long getId(User user) {
+        return user.getId();
+    }
+
+    @Override
+    public long getId(float id) {
+        return 1L;
+    }
+
+    @Override
+    public String getName(int id) {
+        return "Midnight111";
+    }
+
+    @Override
+    public int[] getIds() {
+        return new int[]{1, 2, 3};
+    }
+
+    @Override
+    public long[] getLongIds() {
+        return new long[]{4L, 5L, 6L};
+    }
+
+    @Override
+    public int[] getIds(int[] ids) {
+        return ids;
     }
 }
