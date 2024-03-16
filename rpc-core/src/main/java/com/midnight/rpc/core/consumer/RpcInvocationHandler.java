@@ -1,13 +1,16 @@
 package com.midnight.rpc.core.consumer;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.midnight.rpc.core.api.RpcRequest;
 import com.midnight.rpc.core.api.RpcResponse;
 import com.midnight.rpc.core.util.MethodUtils;
+import com.midnight.rpc.core.util.TypeUtils;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Objects;
@@ -24,7 +27,7 @@ public class RpcInvocationHandler implements InvocationHandler {
     }
 
     @Override
-    public Object invoke(Object o, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object o, Method method, Object[] args) {
         // 本地方法不走远程调用
         if (MethodUtils.checkLocalMethod(method.getName())) {
             return null;
@@ -33,19 +36,27 @@ public class RpcInvocationHandler implements InvocationHandler {
         // 封装请求参数
         RpcRequest request = new RpcRequest();
         request.setService(service.getCanonicalName());
-        request.setMethod(method.getName());
+        request.setMethodSign(MethodUtils.methodSign(method));
         request.setArgs(args);
 
         // 发起远程调用
         RpcResponse response = post(request);
         if (Boolean.TRUE.equals(response.getStatus())) {
             Object data = response.getData();
-            // 类对象
+            // 处理返回值的参数类型转换
             if (data instanceof JSONObject jsonResult) {
                 return jsonResult.toJavaObject(method.getReturnType());
+            } else if (data instanceof JSONArray jsonArray) {
+                Object[] array = jsonArray.toArray();
+                Class<?> componentType = method.getReturnType().getComponentType();
+                Object resArray = Array.newInstance(componentType, array.length);
+                for (int i = 0; i < array.length; i++) {
+                    Array.set(resArray, i, array[i]);
+                }
+                return resArray;
             } else {
-                // 基本类型
-                return data;
+                // 其他类型转换
+                return TypeUtils.cast(data, method.getReturnType());
             }
         } else {
             throw new RuntimeException(response.getEx());
@@ -56,7 +67,7 @@ public class RpcInvocationHandler implements InvocationHandler {
     // 通过 OkHttp 发起http请求
     OkHttpClient client = new OkHttpClient.Builder()
             .connectionPool(new ConnectionPool(16, 60, TimeUnit.SECONDS))
-            .readTimeout(1, TimeUnit.SECONDS)
+            .readTimeout(600, TimeUnit.SECONDS)
             .writeTimeout(1, TimeUnit.SECONDS)
             .connectTimeout(1, TimeUnit.SECONDS)
             .build();

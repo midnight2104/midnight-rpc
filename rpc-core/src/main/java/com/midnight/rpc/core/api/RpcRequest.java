@@ -12,7 +12,7 @@ public class RpcRequest {
     /**
      * 方法名
      */
-    private String method;
+    private String methodSign;
 
     /**
      * 参数

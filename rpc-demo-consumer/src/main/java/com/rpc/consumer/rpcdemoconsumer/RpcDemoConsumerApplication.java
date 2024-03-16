@@ -2,7 +2,6 @@ package com.rpc.consumer.rpcdemoconsumer;
 
 import com.midnight.rpc.core.annotation.RpcConsumer;
 import com.midnight.rpc.core.consumer.ConsumerConfig;
-import com.midnight.rpc.demo.api.Order;
 import com.midnight.rpc.demo.api.OrderService;
 import com.midnight.rpc.demo.api.User;
 import com.midnight.rpc.demo.api.UserService;
@@ -40,29 +39,37 @@ public class RpcDemoConsumerApplication {
     @Bean
     public ApplicationRunner consumerRunner() {
         return x -> {
-            // 类对象的远程调用
-            User user = userService.findById(19);
-            System.out.println("类对象的远程调用 result userService.findById(19) = " + user);
 
-            // 本地方法的远程调用
-            System.out.println("本地方法的远程调用 "+userService.toString());
+         //   System.out.println(" userService.getId(10f) = " + userService.getId(10f));
 
-            // 基本类型的远程调用
-            System.out.println("基本类型的远程调用 "+userService.getId(11));
+            System.out.println(" userService.getId(new User(100,\"Midnight\")) = " +
+                    userService.getId(new User(100, "Midnight")));
 
-            // String类型的远程调用
-            System.out.println("String类型的远程调用 "+userService.getName());
+            User user = userService.findById(1);
+            System.out.println("RPC result userService.findById(1) = " + user);
 
-            // 订单服务
-            Order order = orderService.findById(9);
-            System.out.println("订单服务 RPC result orderService.findById(9) = " + order);
+            User user1 = userService.findById(1, "Midnight");
+            System.out.println("RPC result userService.findById(1, \"Midnight\") = " + user1);
 
-            // 嵌套注入
-            demo2.test();
+            System.out.println(userService.getName());
 
-            // 异常测试
-            System.out.println("异常测试 RPC result orderService.findById(404) ");
-            Order order404 = orderService.findById(404);
+            System.out.println(userService.getName(123));
+
+            System.out.println(userService.toString());
+
+            System.out.println(userService.getId(11));
+
+            System.out.println(userService.getName());
+
+            System.out.println(" ===> userService.getLongIds()");
+            for (long id : userService.getLongIds()) {
+                System.out.println(id);
+            }
+
+            System.out.println(" ===> userService.getLongIds()");
+            for (long id : userService.getIds(new int[]{4, 5, 6})) {
+                System.out.println(id);
+            }
 
         };
     }
