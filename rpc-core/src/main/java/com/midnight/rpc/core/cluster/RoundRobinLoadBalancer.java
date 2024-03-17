@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 轮训的负载均衡器
+ * 轮询的负载均衡器
  *
  * @param <T>
  */
