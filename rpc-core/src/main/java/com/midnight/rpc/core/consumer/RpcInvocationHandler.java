@@ -3,6 +3,7 @@ package com.midnight.rpc.core.consumer;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.midnight.rpc.core.api.RpcContext;
 import com.midnight.rpc.core.api.RpcRequest;
 import com.midnight.rpc.core.api.RpcResponse;
 import com.midnight.rpc.core.util.MethodUtils;
@@ -19,9 +20,13 @@ public class RpcInvocationHandler implements InvocationHandler {
     final static MediaType JSONTYPE = MediaType.get("application/json; charset=utf-8");
 
     private Class<?> service;
+    private RpcContext context;
+    private List<String> providers;
 
-    public RpcInvocationHandler(Class<?> service) {
+    public RpcInvocationHandler(Class<?> service, RpcContext context, List<String> providers) {
         this.service = service;
+        this.context = context;
+        this.providers = providers;
     }
 
     @Override
@@ -37,8 +42,14 @@ public class RpcInvocationHandler implements InvocationHandler {
         request.setMethodSign(MethodUtils.methodSign(method));
         request.setArgs(args);
 
+        // 负载均衡
+        List<String> urls = context.getRouter().route(providers);
+        String url = (String) context.getLoadBalancer().choose(urls);
+
         // 发起远程调用
-        RpcResponse rpcResponse = post(request);
+        RpcResponse rpcResponse = post(request, url);
+
+        // 处理结果
         if (Boolean.TRUE.equals(rpcResponse.getStatus())) {
             Object data = rpcResponse.getData();
             Class<?> type = method.getReturnType();
@@ -49,8 +60,8 @@ public class RpcInvocationHandler implements InvocationHandler {
                     Type genericReturnType = method.getGenericReturnType();
                     System.out.println(genericReturnType);
                     if (genericReturnType instanceof ParameterizedType parameterizedType) {
-                        Class<?> keyType = (Class<?>)parameterizedType.getActualTypeArguments()[0];
-                        Class<?> valueType = (Class<?>)parameterizedType.getActualTypeArguments()[1];
+                        Class<?> keyType = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+                        Class<?> valueType = (Class<?>) parameterizedType.getActualTypeArguments()[1];
                         System.out.println("keyType  : " + keyType);
                         System.out.println("valueType: " + valueType);
                         jsonResult.entrySet().stream().forEach(
@@ -109,11 +120,11 @@ public class RpcInvocationHandler implements InvocationHandler {
             .connectTimeout(1, TimeUnit.SECONDS)
             .build();
 
-    private RpcResponse post(RpcRequest rpcRequest) {
+    private RpcResponse post(RpcRequest rpcRequest, String url) {
         String reqJson = JSON.toJSONString(rpcRequest);
 
         Request request = new Request.Builder()
-                .url("http://localhost:8080/invoke")    // 远程调用，现在还是本地，后续引入注册中心
+                .url(url + "/invoke")
                 .post(RequestBody.create(reqJson, JSONTYPE))
                 .build();
         try {

@@ -3,14 +3,19 @@ package com.midnight.rpc.demo.provider;
 import com.midnight.rpc.core.annotation.RpcProvider;
 import com.midnight.rpc.demo.api.User;
 import com.midnight.rpc.demo.api.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 @Component
 @RpcProvider
 public class UserServiceImpl implements UserService {
+    @Autowired
+    Environment env;
+
     @Override
     public User findById(int id) {
-        return new User(id, "Midnight-" + System.currentTimeMillis());
+        return new User(id, "Midnight-" + env.getProperty("server.port") + "-" + System.currentTimeMillis());
     }
 
     @Override

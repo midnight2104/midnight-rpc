@@ -1,6 +1,10 @@
 package com.midnight.rpc.core.consumer;
 
 import com.midnight.rpc.core.annotation.RpcConsumer;
+import com.midnight.rpc.core.api.LoadBalancer;
+import com.midnight.rpc.core.api.RegistryCenter;
+import com.midnight.rpc.core.api.Router;
+import com.midnight.rpc.core.api.RpcContext;
 import lombok.Data;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -20,6 +24,15 @@ public class ConsumerBootstrap implements ApplicationContextAware {
     private Map<String, Object> stubs = new HashMap<>();
 
     public void start() {
+        Router router = applicationContext.getBean(Router.class);
+        LoadBalancer loadBalancer = applicationContext.getBean(LoadBalancer.class);
+        RegistryCenter rc = applicationContext.getBean(RegistryCenter.class);
+
+        RpcContext context = new RpcContext();
+        context.setRouter(router);
+        context.setLoadBalancer(loadBalancer);
+
+
         String[] names = applicationContext.getBeanDefinitionNames();
         for (String name : names) {
             Object bean = applicationContext.getBean(name);
@@ -32,8 +45,7 @@ public class ConsumerBootstrap implements ApplicationContextAware {
                     String serviceName = service.getCanonicalName();
                     Object consumer = stubs.get(serviceName);
                     if (consumer == null) {
-                        // 应该放到stubs，避免重复生成代理对象
-                        consumer = createConsumer(service);
+                        consumer = createFromRegistry(service, context, rc);
                     }
                     f.setAccessible(true);
 
@@ -46,9 +58,15 @@ public class ConsumerBootstrap implements ApplicationContextAware {
         }
     }
 
-    private Object createConsumer(Class<?> service) {
+    private Object createFromRegistry(Class<?> service, RpcContext context, RegistryCenter rc) {
+        String serviceName = service.getCanonicalName();
+        List<String> providers = rc.fetchAll(serviceName);
+        return createConsumer(service, context, providers);
+    }
+
+    private Object createConsumer(Class<?> service, RpcContext context, List<String> providers) {
         return Proxy.newProxyInstance(service.getClassLoader(), new Class[]{service},
-                new RpcInvocationHandler(service));
+                new RpcInvocationHandler(service, context, providers));
     }
 
     private List<Field> findConsumerField(Class<?> aClass) {
