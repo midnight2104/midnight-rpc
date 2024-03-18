@@ -8,6 +8,7 @@ import com.midnight.rpc.core.api.RpcRequest;
 import com.midnight.rpc.core.api.RpcResponse;
 import com.midnight.rpc.core.util.MethodUtils;
 import com.midnight.rpc.core.util.TypeUtils;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-
+@Slf4j
 public class RpcInvocationHandler implements InvocationHandler {
     final static MediaType JSONTYPE = MediaType.get("application/json; charset=utf-8");
 
@@ -45,6 +46,7 @@ public class RpcInvocationHandler implements InvocationHandler {
         // 负载均衡
         List<String> urls = context.getRouter().route(providers);
         String url = (String) context.getLoadBalancer().choose(urls);
+        log.info("===> loadBalancer choose():" + url);
 
         // 发起远程调用
         RpcResponse rpcResponse = post(request, url);

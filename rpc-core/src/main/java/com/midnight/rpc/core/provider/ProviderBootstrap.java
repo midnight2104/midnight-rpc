@@ -1,13 +1,17 @@
 package com.midnight.rpc.core.provider;
 
 import com.midnight.rpc.core.annotation.RpcProvider;
+import com.midnight.rpc.core.api.RegistryCenter;
 import com.midnight.rpc.core.api.RpcRequest;
 import com.midnight.rpc.core.api.RpcResponse;
 import com.midnight.rpc.core.meta.ProviderMeta;
 import com.midnight.rpc.core.util.MethodUtils;
 import com.midnight.rpc.core.util.TypeUtils;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.Data;
+import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.LinkedMultiValueMap;
@@ -15,6 +19,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -23,15 +28,48 @@ import java.util.Map;
 public class ProviderBootstrap implements ApplicationContextAware {
     // 变量名称保持一致就可以不用写抽象方法。
     private ApplicationContext applicationContext;
+
     private MultiValueMap<String, ProviderMeta> skeletons = new LinkedMultiValueMap<>();
+
+    private String instance;
+
+    @Value("${server.port}")
+    private String port;
 
     // 在bean的初始化过程中，保存起来
     @PostConstruct
-    public void buildProviders() {
+    public void init() {
         Map<String, Object> providers = applicationContext.getBeansWithAnnotation(RpcProvider.class);
         providers.forEach((x, y) -> System.out.println(x));
 
         providers.values().forEach(x -> genInterface(x));
+    }
+
+
+    @SneakyThrows
+    public void start() {
+        String ip = InetAddress.getLocalHost().getHostAddress();
+        instance = ip + "_" + port;
+        // 服务端provider在启动过程中完成注册
+        skeletons.keySet().forEach(this::registerService);
+    }
+
+    /***
+     * 服务销毁时，取消注册
+     */
+    @PreDestroy
+    public void stop() {
+        skeletons.keySet().forEach(this::unregisterService);
+    }
+
+    private void registerService(String service) {
+        RegistryCenter rc = applicationContext.getBean(RegistryCenter.class);
+        rc.register(service, instance);
+    }
+
+    private void unregisterService(String service) {
+        RegistryCenter rc = applicationContext.getBean(RegistryCenter.class);
+        rc.unregister(service, instance);
     }
 
     private void genInterface(Object x) {

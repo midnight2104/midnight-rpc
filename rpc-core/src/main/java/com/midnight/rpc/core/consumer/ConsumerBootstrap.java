@@ -6,6 +6,7 @@ import com.midnight.rpc.core.api.RegistryCenter;
 import com.midnight.rpc.core.api.Router;
 import com.midnight.rpc.core.api.RpcContext;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -15,7 +16,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Data
 public class ConsumerBootstrap implements ApplicationContextAware {
 
@@ -60,8 +63,23 @@ public class ConsumerBootstrap implements ApplicationContextAware {
 
     private Object createFromRegistry(Class<?> service, RpcContext context, RegistryCenter rc) {
         String serviceName = service.getCanonicalName();
-        List<String> providers = rc.fetchAll(serviceName);
+        List<String> providers = mapUrls(rc.fetchAll(serviceName));
+
+        log.info(" ===> map to providers: ");
+        providers.forEach(System.out::println);
+
+        rc.subscribe(serviceName, event -> {
+            providers.clear();
+            providers.addAll(mapUrls(event.getData()));
+        });
+
         return createConsumer(service, context, providers);
+    }
+
+    private List<String> mapUrls(List<String> nodes) {
+        return nodes.stream()
+                .map(x -> "http://" + x.replace('_', ':'))
+                .collect(Collectors.toList());
     }
 
     private Object createConsumer(Class<?> service, RpcContext context, List<String> providers) {

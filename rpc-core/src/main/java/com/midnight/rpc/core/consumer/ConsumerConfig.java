@@ -4,6 +4,7 @@ import com.midnight.rpc.core.api.LoadBalancer;
 import com.midnight.rpc.core.api.RegistryCenter;
 import com.midnight.rpc.core.api.Router;
 import com.midnight.rpc.core.cluster.RoundRobinLoadBalancer;
+import com.midnight.rpc.core.registry.ZkRegistryCenter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
@@ -43,6 +44,6 @@ public class ConsumerConfig {
 
     @Bean(initMethod = "start", destroyMethod = "stop")
     public RegistryCenter consumerRc() {
-        return new RegistryCenter.StaticRegistryCenter(List.of(servers.split(",")));
+        return new ZkRegistryCenter();
     }
 }

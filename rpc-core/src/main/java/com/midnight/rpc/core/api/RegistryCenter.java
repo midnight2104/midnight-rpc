@@ -1,5 +1,7 @@
 package com.midnight.rpc.core.api;
 
+import com.midnight.rpc.core.registry.ChangedListener;
+
 import java.util.List;
 
 /**
@@ -18,7 +20,8 @@ public interface RegistryCenter {
 
     // consumer侧
     List<String> fetchAll(String service);
-    // void subscribe();
+
+    void subscribe(String service, ChangedListener listener);
 
     /**
      * 静态的注册中心，为后续动态做准备
@@ -55,5 +58,11 @@ public interface RegistryCenter {
         public List<String> fetchAll(String service) {
             return providers;
         }
+
+        @Override
+        public void subscribe(String service, ChangedListener listener) {
+
+        }
+
     }
 }
