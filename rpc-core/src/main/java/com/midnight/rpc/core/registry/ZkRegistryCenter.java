@@ -59,12 +59,11 @@ public class ZkRegistryCenter implements RegistryCenter {
     public void unregister(String service, String instance) {
         String servicePath = "/" + service;
         try {
-            // 创建持久化节点
+            // 服务路径不存在直接返回
             if (client.checkExists().forPath(servicePath) == null) {
                 return;
             }
 
-            // 创建实例的临时节点
             String instancePath = servicePath + "/" + instance;
             log.info("===> unregister to zk :" + instancePath);
             // quietly删除：没有实例也不要报错
@@ -88,7 +87,7 @@ public class ZkRegistryCenter implements RegistryCenter {
     }
 
     @Override
-    public void subscribe(String service, ChangedListener listener) {
+    public void subscribe(String service, ChangedListener listener) throws Exception {
         TreeCache cache = TreeCache.newBuilder(client, "/" + service)
                 .setCacheData(true)
                 .setMaxDepth(2)
@@ -100,5 +99,8 @@ public class ZkRegistryCenter implements RegistryCenter {
                     List<String> nodes = fetchAll(service);
                     listener.fire(new Event(nodes));
                 });
+
+        // 不要忘记启动和关闭
+        cache.start();
     }
 }

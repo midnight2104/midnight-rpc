@@ -21,7 +21,7 @@ public interface RegistryCenter {
     // consumer侧
     List<String> fetchAll(String service);
 
-    void subscribe(String service, ChangedListener listener);
+    void subscribe(String service, ChangedListener listener) throws Exception;
 
     /**
      * 静态的注册中心，为后续动态做准备
