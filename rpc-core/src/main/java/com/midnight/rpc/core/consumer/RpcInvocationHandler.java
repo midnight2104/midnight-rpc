@@ -4,6 +4,7 @@ import com.midnight.rpc.core.api.RpcContext;
 import com.midnight.rpc.core.api.RpcRequest;
 import com.midnight.rpc.core.api.RpcResponse;
 import com.midnight.rpc.core.consumer.http.OkHttpInvoker;
+import com.midnight.rpc.core.meta.InstanceMeta;
 import com.midnight.rpc.core.util.MethodUtils;
 import com.midnight.rpc.core.util.TypeUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -17,10 +18,10 @@ public class RpcInvocationHandler implements InvocationHandler {
 
     private Class<?> service;
     private RpcContext context;
-    private List<String> providers;
+    private List<InstanceMeta> providers;
     private OkHttpInvoker httpInvoker = new OkHttpInvoker();
 
-    public RpcInvocationHandler(Class<?> service, RpcContext context, List<String> providers) {
+    public RpcInvocationHandler(Class<?> service, RpcContext context, List<InstanceMeta> providers) {
         this.service = service;
         this.context = context;
         this.providers = providers;
@@ -40,12 +41,12 @@ public class RpcInvocationHandler implements InvocationHandler {
         request.setArgs(args);
 
         // 负载均衡
-        List<String> urls = context.getRouter().route(providers);
-        String url = (String) context.getLoadBalancer().choose(urls);
-        log.info("===> loadBalancer choose():" + url);
+        List<InstanceMeta> instances = context.getRouter().route(providers);
+        InstanceMeta instance = context.getLoadBalancer().choose(instances);
+        log.info("===> loadBalancer choose():" + instance);
 
         // 发起远程调用
-        RpcResponse rpcResponse = httpInvoker.post(request, url);
+        RpcResponse rpcResponse = httpInvoker.post(request, instance.toURL());
 
         // 处理结果
         if (Boolean.TRUE.equals(rpcResponse.getStatus())) {
@@ -53,7 +54,6 @@ public class RpcInvocationHandler implements InvocationHandler {
             return TypeUtils.castMethodResult(method, data);
         } else {
             Exception ex = rpcResponse.getEx();
-            //ex.printStackTrace();
             throw new RuntimeException(ex);
         }
     }

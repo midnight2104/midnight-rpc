@@ -4,7 +4,9 @@ import com.midnight.rpc.core.annotation.RpcProvider;
 import com.midnight.rpc.core.api.RegistryCenter;
 import com.midnight.rpc.core.api.RpcRequest;
 import com.midnight.rpc.core.api.RpcResponse;
+import com.midnight.rpc.core.meta.InstanceMeta;
 import com.midnight.rpc.core.meta.ProviderMeta;
+import com.midnight.rpc.core.meta.ServiceMeta;
 import com.midnight.rpc.core.util.MethodUtils;
 import com.midnight.rpc.core.util.TypeUtils;
 import jakarta.annotation.PostConstruct;
@@ -31,11 +33,21 @@ public class ProviderBootstrap implements ApplicationContextAware {
 
     private MultiValueMap<String, ProviderMeta> skeletons = new LinkedMultiValueMap<>();
 
-    private String instance;
+    private InstanceMeta instance;
     private RegistryCenter rc;
 
     @Value("${server.port}")
     private String port;
+
+
+    @Value("${app.id}")
+    private String app;
+
+    @Value("${app.namespace}")
+    private String namespace;
+
+    @Value("${app.env}")
+    private String env;
 
     // 在bean的初始化过程中，保存起来
     @PostConstruct
@@ -50,7 +62,7 @@ public class ProviderBootstrap implements ApplicationContextAware {
     @SneakyThrows
     public void start() {
         String ip = InetAddress.getLocalHost().getHostAddress();
-        instance = ip + "_" + port;
+        instance = InstanceMeta.http(ip,Integer.valueOf(port));
         rc.start();
         // 服务端provider在启动过程中完成注册
         skeletons.keySet().forEach(this::registerService);
@@ -66,13 +78,13 @@ public class ProviderBootstrap implements ApplicationContextAware {
     }
 
     private void registerService(String service) {
-        RegistryCenter rc = applicationContext.getBean(RegistryCenter.class);
-        rc.register(service, instance);
+        ServiceMeta serviceMeta = ServiceMeta.builder().namespace(namespace).name(service).env(env).app(app).build();
+        rc.register(serviceMeta, instance);
     }
 
     private void unregisterService(String service) {
-        RegistryCenter rc = applicationContext.getBean(RegistryCenter.class);
-        rc.unregister(service, instance);
+        ServiceMeta serviceMeta = ServiceMeta.builder().namespace(namespace).name(service).env(env).app(app).build();
+        rc.unregister(serviceMeta, instance);
     }
 
     private void genInterface(Object x) {

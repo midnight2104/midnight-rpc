@@ -1,5 +1,7 @@
 package com.midnight.rpc.core.api;
 
+import com.midnight.rpc.core.meta.InstanceMeta;
+import com.midnight.rpc.core.meta.ServiceMeta;
 import com.midnight.rpc.core.registry.ChangedListener;
 
 import java.util.List;
@@ -14,23 +16,23 @@ public interface RegistryCenter {
 
 
     // provider侧
-    void register(String service, String instance);
+    void register(ServiceMeta service, InstanceMeta instance);
 
-    void unregister(String service, String instance);
+    void unregister(ServiceMeta service, InstanceMeta instance);
 
     // consumer侧
-    List<String> fetchAll(String service);
+    List<InstanceMeta> fetchAll(ServiceMeta service);
 
-    void subscribe(String service, ChangedListener listener) throws Exception;
+    void subscribe(ServiceMeta service, ChangedListener listener);
 
     /**
      * 静态的注册中心，为后续动态做准备
      */
     class StaticRegistryCenter implements RegistryCenter {
 
-        private List<String> providers;
+        private List<InstanceMeta> providers;
 
-        public StaticRegistryCenter(List<String> providers) {
+        public StaticRegistryCenter(List<InstanceMeta> providers) {
             this.providers = providers;
         }
 
@@ -45,22 +47,22 @@ public interface RegistryCenter {
         }
 
         @Override
-        public void register(String service, String instance) {
+        public void register(ServiceMeta service, InstanceMeta instance) {
 
         }
 
         @Override
-        public void unregister(String service, String instance) {
+        public void unregister(ServiceMeta ServiceMeta, InstanceMeta instance) {
 
         }
 
         @Override
-        public List<String> fetchAll(String service) {
+        public List<InstanceMeta> fetchAll(ServiceMeta service) {
             return providers;
         }
 
         @Override
-        public void subscribe(String service, ChangedListener listener) {
+        public void subscribe(ServiceMeta service, ChangedListener listener) {
 
         }
 
