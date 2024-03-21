@@ -1,7 +1,7 @@
 package com.midnight.rpc.core.provider;
 
 import com.midnight.rpc.core.api.RegistryCenter;
-import com.midnight.rpc.core.registry.ZkRegistryCenter;
+import com.midnight.rpc.core.registry.zk.ZkRegistryCenter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +14,11 @@ public class ProviderConfig {
     @Bean
     public ProviderBootstrap providerBootstrap() {
         return new ProviderBootstrap();
+    }
+
+    @Bean
+    ProviderInvoker providerInvoker(@Autowired ProviderBootstrap providerBootstrap) {
+        return new ProviderInvoker(providerBootstrap);
     }
 
     /**

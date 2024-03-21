@@ -7,6 +7,7 @@ import com.midnight.rpc.core.api.Router;
 import com.midnight.rpc.core.api.RpcContext;
 import com.midnight.rpc.core.meta.InstanceMeta;
 import com.midnight.rpc.core.meta.ServiceMeta;
+import com.midnight.rpc.core.util.MethodUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Data
@@ -53,7 +53,7 @@ public class ConsumerBootstrap implements ApplicationContextAware {
         for (String name : names) {
             Object bean = applicationContext.getBean(name);
 
-            List<Field> fields = findConsumerField(bean.getClass());
+            List<Field> fields = MethodUtils.findConsumerField(bean.getClass());
             fields.forEach(f -> {
 
                 try {
@@ -91,31 +91,10 @@ public class ConsumerBootstrap implements ApplicationContextAware {
         return createConsumer(service, context, providers);
     }
 
-    private List<String> mapUrls(List<String> nodes) {
-        return nodes.stream()
-                .map(x -> "http://" + x.replace('_', ':'))
-                .collect(Collectors.toList());
-    }
-
     private Object createConsumer(Class<?> service, RpcContext context, List<InstanceMeta> providers) {
         return Proxy.newProxyInstance(service.getClassLoader(), new Class[]{service},
                 new RpcInvocationHandler(service, context, providers));
     }
 
-    private List<Field> findConsumerField(Class<?> aClass) {
-        List<Field> res = new ArrayList<>();
 
-        while (aClass != null) {
-            Field[] fields = aClass.getDeclaredFields();
-            for (Field f : fields) {
-                if (f.isAnnotationPresent(RpcConsumer.class)) {
-                    res.add(f);
-                }
-            }
-            // bean有可能被CGLIB增强了
-            aClass = aClass.getSuperclass();
-        }
-
-        return res;
-    }
 }

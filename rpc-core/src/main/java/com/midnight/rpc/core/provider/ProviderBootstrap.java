@@ -2,13 +2,10 @@ package com.midnight.rpc.core.provider;
 
 import com.midnight.rpc.core.annotation.RpcProvider;
 import com.midnight.rpc.core.api.RegistryCenter;
-import com.midnight.rpc.core.api.RpcRequest;
-import com.midnight.rpc.core.api.RpcResponse;
 import com.midnight.rpc.core.meta.InstanceMeta;
 import com.midnight.rpc.core.meta.ProviderMeta;
 import com.midnight.rpc.core.meta.ServiceMeta;
 import com.midnight.rpc.core.util.MethodUtils;
-import com.midnight.rpc.core.util.TypeUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.Data;
@@ -19,11 +16,9 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 @Data
@@ -62,7 +57,7 @@ public class ProviderBootstrap implements ApplicationContextAware {
     @SneakyThrows
     public void start() {
         String ip = InetAddress.getLocalHost().getHostAddress();
-        instance = InstanceMeta.http(ip,Integer.valueOf(port));
+        instance = InstanceMeta.http(ip, Integer.valueOf(port));
         rc.start();
         // 服务端provider在启动过程中完成注册
         skeletons.keySet().forEach(this::registerService);
@@ -87,19 +82,14 @@ public class ProviderBootstrap implements ApplicationContextAware {
         rc.unregister(serviceMeta, instance);
     }
 
-    private void genInterface(Object x) {
+    private void genInterface(Object impl) {
         // 实现多个接口
-        Arrays.stream(x.getClass().getInterfaces()).forEach(
-                inter -> {
-                    Method[] methods = inter.getMethods();
-                    for (Method method : methods) {
-                        if (MethodUtils.checkLocalMethod(method)) {
-                            continue;
-                        }
-                        createProvider(inter, x, method);
-
-                    }
-                }
+        Arrays.stream(impl.getClass().getInterfaces()).forEach(
+                service -> Arrays.stream(service.getMethods())
+                        .filter(method -> !MethodUtils.checkLocalMethod(method))
+                        .forEach(method -> {
+                            createProvider(service, impl, method);
+                        })
         );
 
     }
@@ -113,46 +103,5 @@ public class ProviderBootstrap implements ApplicationContextAware {
         skeletons.add(inter.getCanonicalName(), meta);
     }
 
-    public RpcResponse invoke(RpcRequest request) {
-        RpcResponse rpcResponse = new RpcResponse();
-
-        List<ProviderMeta> metas = skeletons.get(request.getService());
-        // 使用方法签名查询提供者元信息
-        ProviderMeta meta = findProviderMeta(metas, request.getMethodSign());
-        try {
-            Method method = meta.getMethod();
-
-            // 参数类型转换
-            Object[] args = processArgs(request.getArgs(), method.getParameterTypes());
-
-            // 反射
-            Object res = method.invoke(meta.getServiceImpl(), args);
-            rpcResponse.setStatus(true);
-            rpcResponse.setData(res);
-            return rpcResponse;
-        } catch (InvocationTargetException e) {
-            // 处理异常
-            rpcResponse.setEx(new RuntimeException(e.getTargetException().getMessage()));
-        } catch (IllegalAccessException e) {
-            rpcResponse.setEx(new RuntimeException(e.getMessage()));
-        }
-        return rpcResponse;
-    }
-
-    private Object[] processArgs(Object[] args, Class<?>[] parameterTypes) {
-        if (args == null || args.length == 0) return args;
-        Object[] actuals = new Object[args.length];
-        for (int i = 0; i < args.length; i++) {
-            actuals[i] = TypeUtils.cast(args[i], parameterTypes[i]);
-        }
-        return actuals;
-    }
-
-    private ProviderMeta findProviderMeta(List<ProviderMeta> metas, String methodSign) {
-        return metas.stream()
-                .filter(x -> x.getMethodSign().equals(methodSign))
-                .findFirst()
-                .orElse(null);
-    }
 
 }

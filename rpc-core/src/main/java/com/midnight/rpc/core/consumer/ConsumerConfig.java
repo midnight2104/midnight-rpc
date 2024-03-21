@@ -4,15 +4,13 @@ import com.midnight.rpc.core.api.LoadBalancer;
 import com.midnight.rpc.core.api.RegistryCenter;
 import com.midnight.rpc.core.api.Router;
 import com.midnight.rpc.core.cluster.RoundRobinLoadBalancer;
-import com.midnight.rpc.core.registry.ZkRegistryCenter;
+import com.midnight.rpc.core.registry.zk.ZkRegistryCenter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-
-import java.util.List;
 
 
 @Configuration
