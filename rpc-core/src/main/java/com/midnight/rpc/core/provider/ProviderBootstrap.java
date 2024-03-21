@@ -32,6 +32,7 @@ public class ProviderBootstrap implements ApplicationContextAware {
     private MultiValueMap<String, ProviderMeta> skeletons = new LinkedMultiValueMap<>();
 
     private String instance;
+    private RegistryCenter rc;
 
     @Value("${server.port}")
     private String port;
@@ -40,7 +41,7 @@ public class ProviderBootstrap implements ApplicationContextAware {
     @PostConstruct
     public void init() {
         Map<String, Object> providers = applicationContext.getBeansWithAnnotation(RpcProvider.class);
-        providers.forEach((x, y) -> System.out.println(x));
+        rc = applicationContext.getBean(RegistryCenter.class);
 
         providers.values().forEach(x -> genInterface(x));
     }
@@ -50,6 +51,7 @@ public class ProviderBootstrap implements ApplicationContextAware {
     public void start() {
         String ip = InetAddress.getLocalHost().getHostAddress();
         instance = ip + "_" + port;
+        rc.start();
         // 服务端provider在启动过程中完成注册
         skeletons.keySet().forEach(this::registerService);
     }
@@ -60,6 +62,7 @@ public class ProviderBootstrap implements ApplicationContextAware {
     @PreDestroy
     public void stop() {
         skeletons.keySet().forEach(this::unregisterService);
+        rc.stop();
     }
 
     private void registerService(String service) {

@@ -30,7 +30,7 @@ public class ProviderConfig {
     }
 
 
-    @Bean(initMethod = "start", destroyMethod = "stop")
+    @Bean
     public RegistryCenter providerRc() {
         return new ZkRegistryCenter();
     }
