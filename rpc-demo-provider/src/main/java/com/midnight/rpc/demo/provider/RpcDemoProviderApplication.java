@@ -28,7 +28,7 @@ public class RpcDemoProviderApplication {
     private ProviderInvoker providerInvoker;
 
     @RequestMapping("/")
-    public RpcResponse invoke(@RequestBody RpcRequest request) {
+    public RpcResponse<Object> invoke(@RequestBody RpcRequest request) {
         return providerInvoker.invoke(request);
     }
 
