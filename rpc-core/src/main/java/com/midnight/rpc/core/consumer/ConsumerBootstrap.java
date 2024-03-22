@@ -5,7 +5,12 @@ import com.midnight.rpc.core.api.LoadBalancer;
 import com.midnight.rpc.core.api.RegistryCenter;
 import com.midnight.rpc.core.api.Router;
 import com.midnight.rpc.core.api.RpcContext;
+import com.midnight.rpc.core.meta.InstanceMeta;
+import com.midnight.rpc.core.meta.ServiceMeta;
+import com.midnight.rpc.core.util.MethodUtils;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -16,8 +21,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Data
 public class ConsumerBootstrap implements ApplicationContextAware {
+
+    @Value("${app.id}")
+    private String app;
+
+    @Value("${app.namespace}")
+    private String namespace;
+
+    @Value("${app.env}")
+    private String env;
+
 
     private ApplicationContext applicationContext;
 
@@ -37,7 +53,7 @@ public class ConsumerBootstrap implements ApplicationContextAware {
         for (String name : names) {
             Object bean = applicationContext.getBean(name);
 
-            List<Field> fields = findConsumerField(bean.getClass());
+            List<Field> fields = MethodUtils.findConsumerField(bean.getClass());
             fields.forEach(f -> {
 
                 try {
@@ -59,30 +75,26 @@ public class ConsumerBootstrap implements ApplicationContextAware {
     }
 
     private Object createFromRegistry(Class<?> service, RpcContext context, RegistryCenter rc) {
-        String serviceName = service.getCanonicalName();
-        List<String> providers = rc.fetchAll(serviceName);
+        ServiceMeta serviceMeta = ServiceMeta.builder()
+                .app(app)
+                .name(service.getCanonicalName())
+                .namespace(namespace)
+                .env(env)
+                .build();
+        List<InstanceMeta> providers = rc.fetchAll(serviceMeta);
+
+        rc.subscribe(serviceMeta, event -> {
+            providers.clear();
+            providers.addAll(event.getData());
+        });
+
         return createConsumer(service, context, providers);
     }
 
-    private Object createConsumer(Class<?> service, RpcContext context, List<String> providers) {
+    private Object createConsumer(Class<?> service, RpcContext context, List<InstanceMeta> providers) {
         return Proxy.newProxyInstance(service.getClassLoader(), new Class[]{service},
                 new RpcInvocationHandler(service, context, providers));
     }
 
-    private List<Field> findConsumerField(Class<?> aClass) {
-        List<Field> res = new ArrayList<>();
 
-        while (aClass != null) {
-            Field[] fields = aClass.getDeclaredFields();
-            for (Field f : fields) {
-                if (f.isAnnotationPresent(RpcConsumer.class)) {
-                    res.add(f);
-                }
-            }
-            // bean有可能被CGLIB增强了
-            aClass = aClass.getSuperclass();
-        }
-
-        return res;
-    }
 }

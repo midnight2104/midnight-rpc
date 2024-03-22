@@ -1,7 +1,12 @@
 package com.midnight.rpc.core.util;
 
+import com.midnight.rpc.core.annotation.RpcConsumer;
+
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class MethodUtils {
 
@@ -27,5 +32,22 @@ public class MethodUtils {
                 p -> sb.append("_").append(p.getCanonicalName()));
 
         return sb.toString();
+    }
+
+    public static List<Field> findConsumerField(Class<?> aClass) {
+        List<Field> res = new ArrayList<>();
+
+        while (aClass != null) {
+            Field[] fields = aClass.getDeclaredFields();
+            for (Field f : fields) {
+                if (f.isAnnotationPresent(RpcConsumer.class)) {
+                    res.add(f);
+                }
+            }
+            // bean有可能被CGLIB增强了
+            aClass = aClass.getSuperclass();
+        }
+
+        return res;
     }
 }
