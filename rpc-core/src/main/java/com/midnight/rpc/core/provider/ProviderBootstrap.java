@@ -34,7 +34,6 @@ public class ProviderBootstrap implements ApplicationContextAware {
     @Value("${server.port}")
     private String port;
 
-
     @Value("${app.id}")
     private String app;
 

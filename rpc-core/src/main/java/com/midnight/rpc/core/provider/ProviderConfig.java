@@ -30,7 +30,7 @@ public class ProviderConfig {
      */
     @Bean
     @Order(Integer.MIN_VALUE)
-    public ApplicationRunner consumerBootstrapRunner(@Autowired ProviderBootstrap providerBootstrap) {
+    public ApplicationRunner providerBootstrapRunner(@Autowired ProviderBootstrap providerBootstrap) {
         return x -> providerBootstrap.start();
     }
 
