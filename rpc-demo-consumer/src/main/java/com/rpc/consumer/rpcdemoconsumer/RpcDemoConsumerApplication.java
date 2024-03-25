@@ -46,7 +46,7 @@ public class RpcDemoConsumerApplication {
     public ApplicationRunner consumerRunner() {
         return x -> {
 
-         //   System.out.println(" userService.getId(10f) = " + userService.getId(10f));
+            System.out.println(" userService.getId(10f) = " + userService.getId(10f));
 
             System.out.println(" userService.getId(new User(100,\"Midnight\")) = " +
                     userService.getId(new User(100, "Midnight")));
@@ -67,15 +67,15 @@ public class RpcDemoConsumerApplication {
 
             System.out.println(userService.getName());
 
-            System.out.println(" ===> userService.getLongIds()");
-            for (long id : userService.getLongIds()) {
-                System.out.println(id);
-            }
-
-            System.out.println(" ===> userService.getLongIds()");
-            for (long id : userService.getIds(new int[]{4, 5, 6})) {
-                System.out.println(id);
-            }
+//            System.out.println(" ===> userService.getLongIds()");
+//            for (long id : userService.getLongIds()) {
+//                System.out.println(id);
+//            }
+//
+//            System.out.println(" ===> userService.getLongIds()");
+//            for (long id : userService.getIds(new int[]{4, 5, 6})) {
+//                System.out.println(id);
+//            }
 
         };
     }

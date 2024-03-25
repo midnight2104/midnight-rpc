@@ -1,10 +1,6 @@
 package com.midnight.rpc.core.consumer;
 
-import com.midnight.rpc.core.annotation.RpcConsumer;
-import com.midnight.rpc.core.api.LoadBalancer;
-import com.midnight.rpc.core.api.RegistryCenter;
-import com.midnight.rpc.core.api.Router;
-import com.midnight.rpc.core.api.RpcContext;
+import com.midnight.rpc.core.api.*;
 import com.midnight.rpc.core.meta.InstanceMeta;
 import com.midnight.rpc.core.meta.ServiceMeta;
 import com.midnight.rpc.core.util.MethodUtils;
@@ -16,7 +12,6 @@ import org.springframework.context.ApplicationContextAware;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,11 +38,13 @@ public class ConsumerBootstrap implements ApplicationContextAware {
         Router router = applicationContext.getBean(Router.class);
         LoadBalancer loadBalancer = applicationContext.getBean(LoadBalancer.class);
         RegistryCenter rc = applicationContext.getBean(RegistryCenter.class);
+        List<Filter> filters = applicationContext.getBeansOfType(Filter.class).values().stream().toList();
+
 
         RpcContext context = new RpcContext();
         context.setRouter(router);
         context.setLoadBalancer(loadBalancer);
-
+        context.setFilters(filters);
 
         String[] names = applicationContext.getBeanDefinitionNames();
         for (String name : names) {

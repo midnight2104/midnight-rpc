@@ -1,5 +1,6 @@
 package com.midnight.rpc.core.consumer;
 
+import com.midnight.rpc.core.api.Filter;
 import com.midnight.rpc.core.api.RpcContext;
 import com.midnight.rpc.core.api.RpcRequest;
 import com.midnight.rpc.core.api.RpcResponse;
@@ -40,6 +41,16 @@ public class RpcInvocationHandler implements InvocationHandler {
         request.setMethodSign(MethodUtils.methodSign(method));
         request.setArgs(args);
 
+
+        // 前置过滤器
+        for (Filter filter : context.getFilters()) {
+            Object preResult = filter.preFilter(request);
+            if (preResult != null) {
+                log.debug(filter.getClass().getName() + " ===> preFilter: " + preResult);
+                return preResult;
+            }
+        }
+
         // 负载均衡
         List<InstanceMeta> instances = context.getRouter().route(providers);
         InstanceMeta instance = context.getLoadBalancer().choose(instances);
@@ -49,6 +60,22 @@ public class RpcInvocationHandler implements InvocationHandler {
         RpcResponse rpcResponse = httpInvoker.post(request, instance.toURL());
 
         // 处理结果
+        Object result = castReturnResult(method, rpcResponse);
+
+
+        // 后置过滤器
+        for (Filter filter : context.getFilters()) {
+            Object postResult = filter.postFilter(request, rpcResponse, result);
+            if (postResult != null) {
+                return postResult;
+            }
+        }
+
+        return result;
+    }
+
+
+    private Object castReturnResult(Method method, RpcResponse rpcResponse) {
         if (Boolean.TRUE.equals(rpcResponse.getStatus())) {
             Object data = rpcResponse.getData();
             return TypeUtils.castMethodResult(method, data);
