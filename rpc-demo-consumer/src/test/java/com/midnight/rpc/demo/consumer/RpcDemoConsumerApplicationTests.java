@@ -1,6 +1,7 @@
 package com.midnight.rpc.demo.consumer;
 
 import com.midnight.rpc.core.test.TestZkServer;
+import com.midnight.rpc.demo.provider.RpcDemoProviderApplication;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -21,7 +22,7 @@ class RpcDemoConsumerApplicationTests {
         log.info("============================");
         log.info("============================");
         zkServer.start();
-        context = SpringApplication.run(RpcDemoConsumerApplication.class,
+        context = SpringApplication.run(RpcDemoProviderApplication.class,
                 "--server.port=8094", "--midnightrpc.zkServer=localhost:2182",
                 "--logging.level.com.midnight.rpc=info");
     }
