@@ -1,4 +1,4 @@
-package com.rpc.consumer.rpcdemoconsumer;
+package com.midnight.rpc.demo.consumer;
 
 import com.midnight.rpc.core.annotation.RpcConsumer;
 import com.midnight.rpc.core.consumer.ConsumerConfig;
@@ -13,7 +13,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication

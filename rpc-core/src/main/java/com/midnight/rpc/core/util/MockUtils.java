@@ -13,16 +13,12 @@ public class MockUtils {
         if (type.equals(Long.class) || type.equals(Long.TYPE)) {
             return 1000L;
         }
-
         if (Number.class.isAssignableFrom(type)) {
             return 1;
         }
-
         if (type.equals(String.class)) {
             return "this_is_a_mock_string";
         }
-
-
         return mockPojo(type);
     }
 
