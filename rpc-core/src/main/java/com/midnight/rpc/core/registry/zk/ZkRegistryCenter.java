@@ -1,6 +1,7 @@
 package com.midnight.rpc.core.registry.zk;
 
 import com.midnight.rpc.core.api.RegistryCenter;
+import com.midnight.rpc.core.api.RpcException;
 import com.midnight.rpc.core.meta.InstanceMeta;
 import com.midnight.rpc.core.meta.ServiceMeta;
 import com.midnight.rpc.core.registry.ChangedListener;
@@ -64,7 +65,7 @@ public class ZkRegistryCenter implements RegistryCenter {
             log.info("===> register to zk :" + instancePath);
             client.create().withMode(CreateMode.EPHEMERAL).forPath(instancePath, "provider".getBytes());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RpcException(e);
         }
     }
 
@@ -82,7 +83,7 @@ public class ZkRegistryCenter implements RegistryCenter {
             // quietly删除：没有实例也不要报错
             client.delete().quietly().forPath(instancePath);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RpcException(e);
         }
     }
 
@@ -94,7 +95,7 @@ public class ZkRegistryCenter implements RegistryCenter {
             log.info("===> fetchAll from zk : " + servicePath);
             return mapInstance(nodes);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RpcException(e);
         }
     }
 

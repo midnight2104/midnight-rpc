@@ -1,9 +1,6 @@
 package com.midnight.rpc.core.consumer;
 
-import com.midnight.rpc.core.api.Filter;
-import com.midnight.rpc.core.api.RpcContext;
-import com.midnight.rpc.core.api.RpcRequest;
-import com.midnight.rpc.core.api.RpcResponse;
+import com.midnight.rpc.core.api.*;
 import com.midnight.rpc.core.consumer.http.OkHttpInvoker;
 import com.midnight.rpc.core.meta.InstanceMeta;
 import com.midnight.rpc.core.util.MethodUtils;
@@ -81,7 +78,12 @@ public class RpcInvocationHandler implements InvocationHandler {
             return TypeUtils.castMethodResult(method, data);
         } else {
             Exception ex = rpcResponse.getEx();
-            throw new RuntimeException(ex);
+            if (ex instanceof RpcException rpcex) {
+                throw rpcex;
+            } else {
+                throw new RpcException(ex, RpcException.UNKNOWN);
+
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package com.midnight.rpc.core.provider;
 
+import com.midnight.rpc.core.api.RpcException;
 import com.midnight.rpc.core.api.RpcRequest;
 import com.midnight.rpc.core.api.RpcResponse;
 import com.midnight.rpc.core.meta.ProviderMeta;
@@ -37,9 +38,9 @@ public class ProviderInvoker {
             return rpcResponse;
         } catch (InvocationTargetException e) {
             // 处理异常
-            rpcResponse.setEx(new RuntimeException(e.getTargetException().getMessage()));
+            rpcResponse.setEx(new RpcException(e.getTargetException().getMessage()));
         } catch (IllegalAccessException e) {
-            rpcResponse.setEx(new RuntimeException(e.getMessage()));
+            rpcResponse.setEx(new RpcException(e.getMessage()));
         }
         return rpcResponse;
     }
