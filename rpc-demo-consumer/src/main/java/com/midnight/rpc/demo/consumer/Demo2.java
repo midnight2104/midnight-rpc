@@ -1,4 +1,4 @@
-package com.rpc.consumer.rpcdemoconsumer;
+package com.midnight.rpc.demo.consumer;
 
 
 import com.midnight.rpc.core.annotation.RpcConsumer;
