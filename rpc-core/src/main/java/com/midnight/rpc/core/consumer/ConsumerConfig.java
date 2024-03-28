@@ -60,8 +60,8 @@ public class ConsumerConfig {
 //    }
 
 //     cache 和 mock 二选一
-    @Bean
-    public Filter filter2() {
-        return new MockFilter();
-    }
+//    @Bean
+//    public Filter filter2() {
+//        return new MockFilter();
+//    }
 }

@@ -14,13 +14,13 @@ public class OkHttpInvoker implements HttpInvoker {
     private final static MediaType JSON_TYPE = MediaType.get("application/json; charset=utf-8");
     private OkHttpClient client;
 
-    public OkHttpInvoker() {
+    public OkHttpInvoker(int timeout) {
         // 通过 OkHttp 发起http请求
         client = new OkHttpClient.Builder()
                 .connectionPool(new ConnectionPool(16, 60, TimeUnit.SECONDS))
-                .readTimeout(600, TimeUnit.SECONDS)
-                .writeTimeout(1, TimeUnit.SECONDS)
-                .connectTimeout(1, TimeUnit.SECONDS)
+                .readTimeout(timeout, TimeUnit.SECONDS)
+                .writeTimeout(timeout, TimeUnit.SECONDS)
+                .connectTimeout(timeout, TimeUnit.SECONDS)
                 .build();
     }
 

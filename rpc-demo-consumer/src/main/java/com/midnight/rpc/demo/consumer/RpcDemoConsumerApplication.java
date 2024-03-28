@@ -13,6 +13,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
@@ -40,6 +41,13 @@ public class RpcDemoConsumerApplication {
     public User findBy(int id) {
         return userService.findById(id);
     }
+
+
+    @GetMapping("/timeout")
+    public User timeout(@RequestParam("timeout") int timeout) {
+        return userService.find(timeout);
+    }
+
 
     @Bean
     public ApplicationRunner consumerRunner() {

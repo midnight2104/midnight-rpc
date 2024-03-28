@@ -29,6 +29,11 @@ public class ConsumerBootstrap implements ApplicationContextAware {
     @Value("${app.env}")
     private String env;
 
+    @Value("${app.retry}")
+    private int retry;
+
+    @Value("${app.timeout}")
+    private int timeout;
 
     private ApplicationContext applicationContext;
 
@@ -45,6 +50,8 @@ public class ConsumerBootstrap implements ApplicationContextAware {
         context.setRouter(router);
         context.setLoadBalancer(loadBalancer);
         context.setFilters(filters);
+        context.getParameters().put("app.retry", String.valueOf(retry));
+        context.getParameters().put("app.timeout", String.valueOf(timeout));
 
         String[] names = applicationContext.getBeanDefinitionNames();
         for (String name : names) {
