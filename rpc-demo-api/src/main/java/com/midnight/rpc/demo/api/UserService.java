@@ -20,6 +20,10 @@ public interface UserService {
     String getName(int id);
 
     int[] getIds();
+
     long[] getLongIds();
+
     int[] getIds(int[] ids);
+
+    User find(int timeout);
 }

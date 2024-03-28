@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.net.SocketTimeoutException;
 import java.util.List;
 
 @Slf4j
@@ -17,12 +18,15 @@ public class RpcInvocationHandler implements InvocationHandler {
     private Class<?> service;
     private RpcContext context;
     private List<InstanceMeta> providers;
-    private OkHttpInvoker httpInvoker = new OkHttpInvoker();
+    private OkHttpInvoker httpInvoker;
 
     public RpcInvocationHandler(Class<?> service, RpcContext context, List<InstanceMeta> providers) {
         this.service = service;
         this.context = context;
         this.providers = providers;
+        int timeout = Integer.parseInt(context.getParameters()
+                .getOrDefault("app.timeout", "1000"));
+        this.httpInvoker = new OkHttpInvoker(timeout);
     }
 
     @Override
@@ -39,6 +43,25 @@ public class RpcInvocationHandler implements InvocationHandler {
         request.setArgs(args);
 
 
+        // 异常超时重试
+        int retry = Integer.parseInt(context.getParameters()
+                .getOrDefault("app.retry", "1"));
+        while (retry-- > 0) {
+            log.info("===> retry: " + retry);
+            try {
+                return handleInvoke(method, request);
+            } catch (Exception ex) {
+                if (!(ex.getCause() instanceof SocketTimeoutException)) {
+                    throw ex;
+                }
+            }
+        }
+
+        return null;
+
+    }
+
+    private Object handleInvoke(Method method, RpcRequest request) {
         // 前置过滤器
         for (Filter filter : context.getFilters()) {
             Object preResult = filter.preFilter(request);
@@ -82,7 +105,6 @@ public class RpcInvocationHandler implements InvocationHandler {
                 throw rpcex;
             } else {
                 throw new RpcException(ex, RpcException.UNKNOWN);
-
             }
         }
     }

@@ -67,4 +67,17 @@ public class UserServiceImpl implements UserService {
     public int[] getIds(int[] ids) {
         return ids;
     }
+
+    @Override
+    public User find(int timeout) {
+        String port = env.getProperty("server.port");
+        if ("8081".equals(port) || "8094".equals(port)) {
+            try {
+                Thread.sleep(timeout);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return new User(2222, "MID1001-" + port);
+    }
 }
