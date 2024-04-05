@@ -47,7 +47,7 @@ public class RpcInvocationHandler implements InvocationHandler {
                 .getOrDefault("consumer.halfOpenInitialDelay", "10000"));
         int halfOpenDelay = Integer.parseInt(context.getParameters()
                 .getOrDefault("consumer.halfOpenDelay", "60000"));
-        // 10秒后启动，每个60s执行一次halfOpen
+        // 10秒后启动，每隔60s执行一次halfOpen
         this.executor.scheduleWithFixedDelay(this::halfOpen,
                 halfOpenInitialDelay, halfOpenDelay, TimeUnit.MILLISECONDS);
     }
