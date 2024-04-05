@@ -81,4 +81,14 @@ public class UserServiceImpl implements UserService {
         }
         return new User(666, "MID-666-" + port);
     }
+
+    @Override
+    public User isolate(int id) {
+        String port = env.getProperty("server.port");
+        if ("8081".equals(port) || "8094".equals(port)) {
+            System.out.println(100 / id);
+        }
+        return new User(id, "midnight-" + port);
+    }
+
 }

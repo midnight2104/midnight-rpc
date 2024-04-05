@@ -2,7 +2,7 @@ package com.midnight.rpc.demo.provider;
 
 import com.midnight.rpc.core.api.RpcRequest;
 import com.midnight.rpc.core.api.RpcResponse;
-import com.midnight.rpc.core.provider.ProviderConfig;
+import com.midnight.rpc.core.config.ProviderConfig;
 import com.midnight.rpc.core.provider.ProviderInvoker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;

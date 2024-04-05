@@ -26,4 +26,6 @@ public interface UserService {
     int[] getIds(int[] ids);
 
     User find(int timeout);
+
+    User isolate(int id);
 }

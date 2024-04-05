@@ -1,7 +1,7 @@
 package com.midnight.rpc.demo.consumer;
 
 import com.midnight.rpc.core.annotation.RpcConsumer;
-import com.midnight.rpc.core.consumer.ConsumerConfig;
+import com.midnight.rpc.core.config.ConsumerConfig;
 import com.midnight.rpc.demo.api.OrderService;
 import com.midnight.rpc.demo.api.User;
 import com.midnight.rpc.demo.api.UserService;
@@ -46,6 +46,11 @@ public class RpcDemoConsumerApplication {
     @GetMapping("/timeout")
     public User timeout(@RequestParam("timeout") int timeout) {
         return userService.find(timeout);
+    }
+
+    @GetMapping("/isolate")
+    public User isolate(@RequestParam("id") int  id) {
+        return userService.isolate(id);
     }
 
 

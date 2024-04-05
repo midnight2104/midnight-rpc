@@ -14,4 +14,8 @@ public class RpcContext {
     private Router<InstanceMeta> router;
 
     private Map<String, String> parameters = new HashMap<>();
+
+    public String param(String key){
+            return  parameters.get(key);
+    }
 }
