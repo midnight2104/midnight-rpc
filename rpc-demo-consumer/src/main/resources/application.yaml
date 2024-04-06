@@ -6,7 +6,7 @@ midnightrpc:
   #    providers: http://localhost:8081,http://localhost:8082,http://localhost:8083
   zk:
     server: localhost:2181
-    root: kkrpc
+    root: midnightrpc
   app:
     id: app1
     namespace: public

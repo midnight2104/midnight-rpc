@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -23,7 +24,7 @@ public class InstanceMeta {
      */
     private boolean status;
 
-    private Map<String, String> parameters;
+    private Map<String, String> parameters = new HashMap<>();
 
     public InstanceMeta(String schema, String host, Integer port, String context) {
         this.schema = schema;

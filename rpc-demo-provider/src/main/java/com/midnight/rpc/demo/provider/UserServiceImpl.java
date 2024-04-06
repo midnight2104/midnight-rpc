@@ -91,4 +91,11 @@ public class UserServiceImpl implements UserService {
         return new User(id, "midnight-" + port);
     }
 
+    @Override
+    public User gray(int id) {
+        String port = env.getProperty("server.port");
+
+        return new User(id, "midnight-gray-v2-" + port);
+    }
+
 }

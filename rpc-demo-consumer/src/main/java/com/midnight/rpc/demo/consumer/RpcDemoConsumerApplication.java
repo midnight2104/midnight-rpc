@@ -42,6 +42,10 @@ public class RpcDemoConsumerApplication {
         return userService.findById(id);
     }
 
+    @GetMapping("/gray")
+    public User gray(@RequestParam("id") int id) {
+        return userService.gray(id);
+    }
 
     @GetMapping("/timeout")
     public User timeout(@RequestParam("timeout") int timeout) {

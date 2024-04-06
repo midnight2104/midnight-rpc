@@ -89,4 +89,9 @@ public class UserServiceImpl implements UserService {
         }
         return new User(id, "midnight-" + port);
     }
+
+    @Override
+    public User gray(int id) {
+        return new User(id, "midnight-gray-v1");
+    }
 }

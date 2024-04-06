@@ -12,6 +12,6 @@ midnightrpc:
   provider:
     metas:
       dc: bj
-      gray: false
+      gray: true
       unit: B002
 
