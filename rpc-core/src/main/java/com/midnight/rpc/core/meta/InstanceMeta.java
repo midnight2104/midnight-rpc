@@ -1,5 +1,6 @@
 package com.midnight.rpc.core.meta;
 
+import com.alibaba.fastjson.JSON;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -41,5 +42,18 @@ public class InstanceMeta {
 
     public static InstanceMeta http(String host, Integer port) {
         return new InstanceMeta("http", host, port, "");
+    }
+
+    public String toMetas() {
+        return JSON.toJSONString(this.getParameters());
+    }
+
+    public InstanceMeta addParams(Map<String, String> params) {
+        this.getParameters().putAll(params);
+        return this;
+    }
+
+    public String toUrl() {
+        return String.format("%s://%s:%d/%s", schema, host, port, context);
     }
 }

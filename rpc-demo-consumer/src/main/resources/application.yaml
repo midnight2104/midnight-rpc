@@ -2,16 +2,22 @@ server:
   port: 8088
 
 midnightrpc:
-  providers: http://localhost:8081,http://localhost:8082,http://localhost:8083
-  zkServer: localhost:2181
-  zkRoot: midnightrpc
-
-app:
-  id: app1
-  namespace: public
-  env: dev
-  retry: 2
-  timeout: 1
+  #  static:
+  #    providers: http://localhost:8081,http://localhost:8082,http://localhost:8083
+  zk:
+    server: localhost:2181
+    root: kkrpc
+  app:
+    id: app1
+    namespace: public
+    env: dev
+  consumer:
+    retries: 2
+    timeout: 1000
+    grayRatio: 33 # 0-100
+    faultLimit: 10 # 30s 内10次错误则隔离
+    halfOpenInitialDelay: 10000
+    halfOpenDelay: 60000
 
 
 logging:
