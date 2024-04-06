@@ -28,4 +28,6 @@ public interface UserService {
     User find(int timeout);
 
     User isolate(int id);
+
+    User gray(int id);
 }

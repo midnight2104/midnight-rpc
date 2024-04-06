@@ -13,5 +13,6 @@ public class ConsumerConfigProperties {
     private int faultLimit = 3;
     private int halfOpenInitialDelay = 10_000;
     private int halfOpenDelay = 60_000;
+    private int grayRatio = 0;
 
 }

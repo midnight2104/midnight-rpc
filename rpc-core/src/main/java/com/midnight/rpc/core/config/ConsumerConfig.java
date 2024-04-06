@@ -1,8 +1,10 @@
 package com.midnight.rpc.core.config;
 
 import com.midnight.rpc.core.api.*;
+import com.midnight.rpc.core.cluster.GrayRouter;
 import com.midnight.rpc.core.cluster.RoundRobinLoadBalancer;
 import com.midnight.rpc.core.consumer.ConsumerBootstrap;
+import com.midnight.rpc.core.meta.InstanceMeta;
 import com.midnight.rpc.core.registry.zk.ZkRegistryCenter;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -38,13 +40,13 @@ public class ConsumerConfig {
     }
 
     @Bean
-    public LoadBalancer loadBalancer() {
-        return new RoundRobinLoadBalancer();
+    public LoadBalancer<InstanceMeta> loadBalancer() {
+        return new RoundRobinLoadBalancer<>();
     }
 
     @Bean
-    public Router router() {
-        return Router.Default;
+    public Router<InstanceMeta> router() {
+        return new GrayRouter(consumerConfigProperties.getGrayRatio());
     }
 
 

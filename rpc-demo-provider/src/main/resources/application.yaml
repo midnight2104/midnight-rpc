@@ -2,11 +2,16 @@ server:
   port: 8081
 
 midnightrpc:
-  providers: http://localhost:8081,http://localhost:8082,http://localhost:8083
-  zkServer: localhost:2181
-  zkRoot: midnightrpc
+  zk:
+    server: localhost:2181
+    root: midnightrpc
+  app:
+    id: app1
+    namespace: public
+    env: dev
+  provider:
+    metas:
+      dc: bj
+      gray: true
+      unit: B002
 
-app:
-  id: app1
-  namespace: public
-  env: dev
