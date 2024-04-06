@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 描述服务实例的云数据
+ * 描述服务实例的元数据
  */
 @Data
 @AllArgsConstructor
