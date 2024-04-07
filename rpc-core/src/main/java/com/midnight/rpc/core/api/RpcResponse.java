@@ -22,6 +22,6 @@ public class RpcResponse<T> {
     /**
      * 异常对象
      */
-    private Exception ex;
+    private RpcException ex;
 
 }

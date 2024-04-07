@@ -4,6 +4,7 @@ import com.midnight.rpc.core.api.*;
 import com.midnight.rpc.core.cluster.GrayRouter;
 import com.midnight.rpc.core.cluster.RoundRobinLoadBalancer;
 import com.midnight.rpc.core.consumer.ConsumerBootstrap;
+import com.midnight.rpc.core.filter.ParameterFilter;
 import com.midnight.rpc.core.meta.InstanceMeta;
 import com.midnight.rpc.core.registry.zk.ZkRegistryCenter;
 import jakarta.annotation.Resource;
@@ -58,7 +59,7 @@ public class ConsumerConfig {
 
     @Bean
     public Filter defaultFilter() {
-        return Filter.Default;
+        return new ParameterFilter();
     }
 
 //    @Bean
