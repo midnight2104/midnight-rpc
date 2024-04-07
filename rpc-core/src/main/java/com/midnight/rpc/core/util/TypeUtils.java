@@ -97,14 +97,18 @@ public class TypeUtils {
         log.debug("castGeneric: data = " + data);
         log.debug("castGeneric: method.getReturnType() = " + type);
         log.debug("castGeneric: method.getGenericReturnType() = " + genericReturnType);
-        if (data instanceof Map map) { // data是map的情况包括两种，一种是HashMap，一种是JSONObject
-            if (Map.class.isAssignableFrom(type)) { // 目标类型是 Map，此时data可能是map也可能是JO
+        // data是map的情况包括两种，一种是HashMap，一种是JSONObject
+        if (data instanceof Map map) {
+            // 目标类型是 Map，此时data可能是map也可能是JO
+            if (Map.class.isAssignableFrom(type)) {
                 return getMap(genericReturnType, map);
             }
-            if (data instanceof JSONObject jsonObject) {// 此时是Pojo，且数据是JO
+            // 此时是Pojo，且数据是JO
+            if (data instanceof JSONObject jsonObject) {
                 log.debug(" ======> JSONObject -> Pojo");
                 return jsonObject.toJavaObject(type);
-            } else if (!Map.class.isAssignableFrom(type)) { // 此时是Pojo类型，数据是Map
+                // 此时是Pojo类型，数据是Map
+            } else if (!Map.class.isAssignableFrom(type)) {
                 log.debug(" ======> map -> Pojo");
                 return new JSONObject(map).toJavaObject(type);
             } else {
@@ -124,22 +128,27 @@ public class TypeUtils {
         if (type.isArray()) {
             return getArray(type, array);
         } else if (List.class.isAssignableFrom(type)) {
-            log.debug(" ======> list -> list");
-            List<Object> resultList = new ArrayList<>(array.length);
-            log.debug(genericReturnType.toString());
-            if (genericReturnType instanceof ParameterizedType parameterizedType) {
-                Type actualType = parameterizedType.getActualTypeArguments()[0];
-                log.debug(actualType.toString());
-                for (Object o : array) {
-                    resultList.add(cast(o, (Class<?>) actualType));
-                }
-            } else {
-                resultList.addAll(Arrays.asList(array));
-            }
-            return resultList;
+            return getObjectList(genericReturnType, array);
         } else {
             return null;
         }
+    }
+
+    @NotNull
+    private static List<Object> getObjectList(Type genericReturnType, Object[] array) {
+        log.debug(" ======> list -> list");
+        List<Object> resultList = new ArrayList<>(array.length);
+        log.debug(genericReturnType.toString());
+        if (genericReturnType instanceof ParameterizedType parameterizedType) {
+            Type actualType = parameterizedType.getActualTypeArguments()[0];
+            log.debug(actualType.toString());
+            for (Object o : array) {
+                resultList.add(cast(o, (Class<?>) actualType));
+            }
+        } else {
+            resultList.addAll(Arrays.asList(array));
+        }
+        return resultList;
     }
 
     @NotNull
