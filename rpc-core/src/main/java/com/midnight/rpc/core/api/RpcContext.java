@@ -15,7 +15,22 @@ public class RpcContext {
 
     private Map<String, String> parameters = new HashMap<>();
 
-    public String param(String key){
-            return  parameters.get(key);
+    public String param(String key) {
+        return parameters.get(key);
     }
+
+    /**
+     * 跨线程传参
+     */
+    public static ThreadLocal<Map<String, String>> CONTEXT_PARAMETERS = ThreadLocal.withInitial(HashMap::new);
+
+
+    public static void setContextParameter(String key, String value) {
+        CONTEXT_PARAMETERS.get().put(key, value);
+    }
+
+    public static String getContextParameter(String key) {
+        return CONTEXT_PARAMETERS.get().get(key);
+    }
+
 }
