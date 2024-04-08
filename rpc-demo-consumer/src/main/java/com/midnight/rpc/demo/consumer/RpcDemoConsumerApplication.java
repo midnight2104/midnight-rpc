@@ -95,7 +95,7 @@ public class RpcDemoConsumerApplication {
         System.out.println("Case 5. >>===[测试local toString方法]===");
         System.out.println("userService.toString() = " + userService.toString());
 
-        // 测试int类型
+        // 常规int类型，返回int
         System.out.println("Case 6. >>===[常规int类型，返回int]===");
         System.out.println("userService.getId(10) = " + userService.getId(10));
 
