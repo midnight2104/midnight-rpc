@@ -49,7 +49,7 @@ public class ProviderBootstrap implements ApplicationContextAware {
         Map<String, Object> providers = applicationContext.getBeansWithAnnotation(RpcProvider.class);
         rc = applicationContext.getBean(RegistryCenter.class);
 
-        providers.values().forEach(x -> genInterface(x));
+        providers.values().forEach(this::genInterface);
     }
 
 
