@@ -17,7 +17,7 @@ import java.util.List;
 @Slf4j
 public class ProviderInvoker {
 
-    private MultiValueMap<String, ProviderMeta> skeletons;
+    private final MultiValueMap<String, ProviderMeta> skeletons;
 
     public ProviderInvoker(ProviderBootstrap providerBootstrap) {
         this.skeletons = providerBootstrap.getSkeletons();

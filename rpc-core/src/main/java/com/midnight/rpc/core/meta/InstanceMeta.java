@@ -42,7 +42,7 @@ public class InstanceMeta {
     }
 
     public static InstanceMeta http(String host, Integer port) {
-        return new InstanceMeta("http", host, port, "");
+        return new InstanceMeta("http", host, port, "midnight-rpc");
     }
 
     public String toMetas() {
