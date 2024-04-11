@@ -11,6 +11,7 @@ public class RpcException extends RuntimeException {
     public static final String SOCKET_TIMEOUT = "X001" + "-" + "http_invoke_timeout";
     public static final String STOCK_NOT_ENOUGH = "Y001" + "-" + "http_invoke_timeout";
     public static final String UNKNOWN = "Z001" + "-" + "unknown";
+    public static final String ExceedLimitEx = "X003" + "-" + "tps_exceed_limit";
 
     private String errcode;
 
@@ -24,12 +25,18 @@ public class RpcException extends RuntimeException {
     public RpcException(String message, Throwable cause) {
         super(message, cause);
     }
+
     public RpcException(Throwable cause) {
         super(cause);
     }
 
     public RpcException(Throwable cause, String errcode) {
         super(cause);
+        this.errcode = errcode;
+    }
+
+    public RpcException(String message, String errcode) {
+        super(message);
         this.errcode = errcode;
     }
 
