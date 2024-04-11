@@ -1,5 +1,6 @@
 package com.midnight.rpc.demo.provider;
 
+import com.midnight.rpc.core.api.RpcException;
 import com.midnight.rpc.core.api.RpcRequest;
 import com.midnight.rpc.core.api.RpcResponse;
 import com.midnight.rpc.core.config.ProviderConfig;
@@ -77,7 +78,20 @@ public class RpcDemoProviderApplication {
             RpcResponse<Object> rpcResponse4 = transport.invoke(request4);
             System.out.println("return : " + rpcResponse4.getData());
 
-
+            // test 5 for traffic control
+            System.out.println("Provider Case 5. >>===[复杂测试：测试流量并发控制]===");
+            for (int i = 0; i < 120; i++) {
+                try {
+                    Thread.sleep(1000);
+                    RpcResponse<Object> r = transport.invoke(request);
+                    System.out.println(i + " ***>>> " + r.getData());
+                } catch (RpcException e) {
+                    // ignore
+                    System.out.println(i + " ***>>> " + e.getMessage() + " -> " + e.getErrcode());
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         };
     }
 }
