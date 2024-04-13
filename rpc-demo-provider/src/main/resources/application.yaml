@@ -16,3 +16,16 @@ midnightrpc:
       unit: B002
       tc: 20
 
+app:
+  id: midnight
+apollo:
+  cacheDir: /opt/data/
+  cluster: default
+  meta: http://kimmking.cn:8080
+  autoUpdateInjectedSpringProperties: true
+  bootstrap:
+    enabled: true
+    namespaces: rpc-demo-provider.yaml
+    eagerLoad:
+      enabled: false
+

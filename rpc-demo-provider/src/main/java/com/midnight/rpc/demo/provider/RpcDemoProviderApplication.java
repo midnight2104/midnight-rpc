@@ -1,9 +1,12 @@
 package com.midnight.rpc.demo.provider;
 
+import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
 import com.midnight.rpc.core.api.RpcException;
 import com.midnight.rpc.core.api.RpcRequest;
 import com.midnight.rpc.core.api.RpcResponse;
+import com.midnight.rpc.core.config.ApolloChangedListener;
 import com.midnight.rpc.core.config.ProviderConfig;
+import com.midnight.rpc.core.config.ProviderConfigProperties;
 import com.midnight.rpc.core.transport.SpringBootTransport;
 import com.midnight.rpc.demo.api.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +15,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -21,8 +25,14 @@ import java.util.Map;
 
 @SpringBootApplication
 @RestController
+@EnableApolloConfig
 @Import({ProviderConfig.class})
 public class RpcDemoProviderApplication {
+
+    @Bean
+    public ApolloChangedListener apolloChangedListener() {
+        return new ApolloChangedListener();
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(RpcDemoProviderApplication.class, args);
@@ -30,6 +40,15 @@ public class RpcDemoProviderApplication {
 
     @Autowired
     private SpringBootTransport transport;
+
+    @Autowired
+    private ProviderConfigProperties properties;
+
+    @RequestMapping("/metas")
+    public String meta() {
+        System.out.println("====> metas hashcode : " + System.identityHashCode(properties.getMetas()));
+        return properties.getMetas().toString();
+    }
 
     @Bean
     ApplicationRunner providerRun() {
@@ -79,19 +98,19 @@ public class RpcDemoProviderApplication {
             System.out.println("return : " + rpcResponse4.getData());
 
             // test 5 for traffic control
-            System.out.println("Provider Case 5. >>===[复杂测试：测试流量并发控制]===");
-            for (int i = 0; i < 120; i++) {
-                try {
-                    Thread.sleep(1000);
-                    RpcResponse<Object> r = transport.invoke(request);
-                    System.out.println(i + " ***>>> " + r.getData());
-                } catch (RpcException e) {
-                    // ignore
-                    System.out.println(i + " ***>>> " + e.getMessage() + " -> " + e.getErrcode());
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+//            System.out.println("Provider Case 5. >>===[复杂测试：测试流量并发控制]===");
+//            for (int i = 0; i < 30; i++) {
+//                try {
+//                    Thread.sleep(1000);
+//                    RpcResponse<Object> r = transport.invoke(request);
+//                    System.out.println(i + " ***>>> " + r.getData());
+//                } catch (RpcException e) {
+//                    // ignore
+//                    System.out.println(i + " ***>>> " + e.getMessage() + " -> " + e.getErrcode());
+//                } catch (InterruptedException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
         };
     }
 }

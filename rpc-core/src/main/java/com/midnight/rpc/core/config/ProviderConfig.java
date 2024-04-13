@@ -8,6 +8,8 @@ import com.midnight.rpc.core.transport.SpringBootTransport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -19,15 +21,18 @@ public class ProviderConfig {
     @Value("${server.port:8080}")
     private String port;
 
-    @Autowired
-    private AppConfigProperties appConfigProperties;
-
-    @Autowired
-    private ProviderConfigProperties providerConfigProperties;
 
     @Bean
-    ProviderBootstrap providerBootstrap() {
-        return new ProviderBootstrap(port, appConfigProperties, providerConfigProperties);
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "apollo.bootstrap", value = "enabled")
+    public ApolloChangedListener consumerApolloChangedListener() {
+        return new ApolloChangedListener();
+    }
+
+    @Bean
+    ProviderBootstrap providerBootstrap(@Autowired AppConfigProperties ap,
+                                        @Autowired ProviderConfigProperties pp) {
+        return new ProviderBootstrap(port, ap, pp);
     }
 
     @Bean
