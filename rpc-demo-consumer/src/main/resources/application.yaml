@@ -19,6 +19,9 @@ midnightrpc:
     halfOpenInitialDelay: 10000
     halfOpenDelay: 60000
 
+midnightregistry:
+  servers: http://localhost:8484
+
 
 logging:
   level:

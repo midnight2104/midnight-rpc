@@ -6,36 +6,70 @@ import com.midnight.rpc.core.api.RpcResponse;
 import com.midnight.rpc.core.consumer.HttpInvoker;
 import okhttp3.*;
 
-import java.io.IOException;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class OkHttpInvoker implements HttpInvoker {
-    private final static MediaType JSON_TYPE = MediaType.get("application/json; charset=utf-8");
-    private OkHttpClient client;
+
+    final static MediaType JSONTYPE = MediaType.get("application/json; charset=utf-8");
+
+    OkHttpClient client;
 
     public OkHttpInvoker(int timeout) {
-        // 通过 OkHttp 发起http请求
         client = new OkHttpClient.Builder()
                 .connectionPool(new ConnectionPool(16, 60, TimeUnit.SECONDS))
-                .readTimeout(timeout, TimeUnit.SECONDS)
-                .writeTimeout(timeout, TimeUnit.SECONDS)
-                .connectTimeout(timeout, TimeUnit.SECONDS)
+                .readTimeout(timeout, TimeUnit.MILLISECONDS)
+                .writeTimeout(timeout, TimeUnit.MILLISECONDS)
+                .connectTimeout(timeout, TimeUnit.MILLISECONDS)
+                .retryOnConnectionFailure(true)
                 .build();
     }
 
     @Override
     public RpcResponse<?> post(RpcRequest rpcRequest, String url) {
         String reqJson = JSON.toJSONString(rpcRequest);
-
+        log.debug(" ===> reqJson = " + reqJson);
         Request request = new Request.Builder()
                 .url(url)
-                .post(RequestBody.create(reqJson, JSON_TYPE))
+                .post(RequestBody.create(reqJson, JSONTYPE))
                 .build();
         try {
-            String respJson = Objects.requireNonNull(client.newCall(request).execute().body()).string();
-            return JSON.parseObject(respJson, RpcResponse.class);
-        } catch (IOException e) {
+            String respJson = client.newCall(request).execute().body().string();
+            log.debug(" ===> respJson = " + respJson);
+            RpcResponse<Object> rpcResponse = JSON.parseObject(respJson, RpcResponse.class);
+            return rpcResponse;
+        } catch (Exception e) {
+            // e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String post(String requestString, String url) {
+        log.debug(" ===> post  url = {}, requestString = {}", requestString, url);
+        Request request = new Request.Builder()
+                .url(url)
+                .post(RequestBody.create(requestString, JSONTYPE))
+                .build();
+        try {
+            String respJson = client.newCall(request).execute().body().string();
+            log.debug(" ===> respJson = " + respJson);
+            return respJson;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String get(String url) {
+        log.debug(" ===> get url = " + url);
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .build();
+        try {
+            String respJson = client.newCall(request).execute().body().string();
+            log.debug(" ===> respJson = " + respJson);
+            return respJson;
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

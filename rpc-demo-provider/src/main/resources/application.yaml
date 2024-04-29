@@ -16,6 +16,9 @@ midnightrpc:
       unit: B002
       tc: 20
 
+midnightregistry:
+  servers: http://localhost:8484
+
 app:
   id: midnight
 apollo:

@@ -43,7 +43,7 @@ public class RpcDemoConsumerApplication {
         SpringApplication.run(RpcDemoConsumerApplication.class, args);
     }
 
-    @GetMapping("/")
+    @GetMapping("/id")
     public User findBy(int id) {
         return userService.findById(id);
     }

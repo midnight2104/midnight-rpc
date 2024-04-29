@@ -3,7 +3,7 @@ package com.midnight.rpc.core.config;
 import com.midnight.rpc.core.api.RegistryCenter;
 import com.midnight.rpc.core.provider.ProviderBootstrap;
 import com.midnight.rpc.core.provider.ProviderInvoker;
-import com.midnight.rpc.core.registry.zk.ZkRegistryCenter;
+import com.midnight.rpc.core.registry.mid.MidnightRegistryCenter;
 import com.midnight.rpc.core.transport.SpringBootTransport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,9 +53,8 @@ public class ProviderConfig {
         return x -> providerBootstrap.start();
     }
 
-
     @Bean
     public RegistryCenter providerRc() {
-        return new ZkRegistryCenter();
+        return new MidnightRegistryCenter();
     }
 }
