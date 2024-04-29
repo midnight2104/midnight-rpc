@@ -6,7 +6,7 @@ import com.midnight.rpc.core.cluster.RoundRobinLoadBalancer;
 import com.midnight.rpc.core.consumer.ConsumerBootstrap;
 import com.midnight.rpc.core.filter.ParameterFilter;
 import com.midnight.rpc.core.meta.InstanceMeta;
-import com.midnight.rpc.core.registry.zk.ZkRegistryCenter;
+import com.midnight.rpc.core.registry.mid.MidnightRegistryCenter;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +62,7 @@ public class ConsumerConfig {
 
     @Bean(initMethod = "start", destroyMethod = "stop")
     public RegistryCenter consumerRc() {
-        return new ZkRegistryCenter();
+        return new MidnightRegistryCenter();
     }
 
 
